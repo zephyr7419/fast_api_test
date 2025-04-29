@@ -234,7 +234,7 @@ async def get_messages_by_dev_eui(query: MessageQuery):
         filter_condition["content.values.publishedAt"] = date_filter
 
     # 정렬 조건
-    sort_condition = [(query.sort_by, query.sort_order)]
+    sort_condition = [("content.values.publishedAt", -1)]
 
     # 페이지네이션 계산
     skip = (query.page - 1) * query.page_size
