@@ -310,6 +310,8 @@ async def get_messages_by_dev_eui(query: MessageQuery):
             if info is None:
                 info = {
                     "dev_eui": values.get("devEUI", ""),
+                    "device_name": content.get("uplinkEvent", {}).get("deviceInfo", {}).get("deviceName", ""),
+                    "company": content.get("uplinkEvent", {}).get("deviceInfo", {}).get("tags", {}).get("company",""),
                     "sensor_type": content.get("uplinkEvent", None).get("deviceInfo", {}).get("tags", {}).get("type",""),
                     "battery": values.get("batteryLevel", 0),
                     "longitude": values.get("longitude", 0.0),
