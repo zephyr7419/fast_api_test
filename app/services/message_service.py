@@ -100,7 +100,7 @@ async def get_all_devices_latest_data():
         {"$match": {"content.values.devEUI": {"$exists": True}}},
 
         # content.publishedAt 기준으로 정렬 (최신순)
-        {"$sort": {"content.publishedAt": -1}},
+        {"$sort": {"content.values.publishedAt": -1}},
 
         # devEUI 기준으로 그룹화하고 첫 번째 문서(최신)만 유지
         {"$group": {
@@ -230,7 +230,7 @@ async def get_messages_by_dev_eui(query: MessageQuery):
         date_filter["$lte"] = query.end_date
 
     if date_filter:
-        filter_condition["content.publishedAt"] = date_filter
+        filter_condition["content.values.publishedAt"] = date_filter
 
     # 정렬 조건
     sort_condition = [(query.sort_by, query.sort_order)]
@@ -261,7 +261,7 @@ async def get_messages_by_dev_eui(query: MessageQuery):
                 "battery": values.get("batteryLevel", 0),
                 "longitude": values.get("longitude", 0.0),
                 "latitude": values.get("latitude", 0.0),
-                "publishedAt": content.get("publishedAt", datetime.datetime.now())
+                "publishedAt": values.get("publishedAt", datetime.datetime.now())
             }
 
             items.append(MessageDevEUIResponse(**message_data))
