@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Query
 
-from app.schemas.message import MessageDevEUIResponse, AllDevEUIResponse, MessageQuery, PaginatedMessageResponse
+from app.schemas.message import AllDevEUIResponse, MessageQuery
 from app.services.message_service import get_all_dev_euis, get_messages_by_dev_eui, get_all_devices_latest_data
 
 # FastAPI의 APIRouter 사용
@@ -39,7 +39,7 @@ async def get_device_info(
         dev_eui=dev_eui,
         page=page,
         page_size=page_size,
-        sort_by="content.publishedAt",  # MongoDB 필드 경로
+        sort_by="content.values.publishedAt",  # MongoDB 필드 경로
         sort_order=-1
     )
     
@@ -74,7 +74,7 @@ async def get_device_info(
     result = await get_messages_by_dev_eui(query)
     
     # 응답의 날짜를 KST로 변환
-    for item in result['items']:
+    for item in result['logs']:
         if hasattr(item, 'publishedAt') and item.publishedAt:
             # UTC로 저장된 날짜를 KST로 변환하여 표시
             if item.publishedAt.tzinfo is None:

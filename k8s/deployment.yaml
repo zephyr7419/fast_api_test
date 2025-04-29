@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: fastapi-app
-        image: registry.musma.net/lcap/fastapiproject:1.6
+        image: registry.musma.net/lcap/fastapiproject:1.9
         imagePullPolicy: Always
         ports:
         - containerPort: 8000

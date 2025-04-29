@@ -249,6 +249,8 @@ async def get_messages_by_dev_eui(query: MessageQuery):
     cursor.limit(query.page_size)
 
     items = []
+    info = None
+
     async for doc in cursor:
         try:
             # 필요한 필드 추출
@@ -257,23 +259,78 @@ async def get_messages_by_dev_eui(query: MessageQuery):
 
             logger.info(f"values: {values}")
 
+            # 원본 publishedAt 값 (데이터베이스에 저장된 그대로)
+            original_published_at = values.get("publishedAt", datetime.datetime.now())
+
+            # KST 문자열 생성
+            kst_dt = None
+            if isinstance(original_published_at, str):
+                # 문자열 형식 확인 및 처리
+                try:
+                    if "+09:00" in original_published_at:  # 이미 KST
+                        kst_dt = datetime.datetime.fromisoformat(original_published_at)
+                    elif "Z" in original_published_at:  # UTC with Z
+                        utc_dt = datetime.datetime.fromisoformat(original_published_at.replace('Z', '+00:00'))
+                        kst_dt = utc_dt + datetime.timedelta(hours=9)
+                    elif "+" in original_published_at or "-" in original_published_at:  # 다른 시간대
+                        dt = datetime.datetime.fromisoformat(original_published_at)
+                        # 시간대 정보 제거 후 UTC로 간주하고 KST로 변환
+                        utc_dt = dt.replace(tzinfo=None)
+                        kst_dt = utc_dt + datetime.timedelta(hours=9)
+                    else:  # 시간대 정보 없음
+                        utc_dt = datetime.datetime.fromisoformat(original_published_at)
+                        kst_dt = utc_dt + datetime.timedelta(hours=9)
+                except ValueError:
+                    # 다른 형식인 경우 기본 파싱 시도
+                    try:
+                        utc_dt = datetime.datetime.strptime(original_published_at, "%Y-%m-%dT%H:%M:%S")
+                        kst_dt = utc_dt + datetime.timedelta(hours=9)
+                    except ValueError:
+                        kst_dt = datetime.datetime.now()  # 파싱 실패 시 현재 시간
+            else:
+                # datetime 객체인 경우 UTC로 간주
+                kst_dt = original_published_at + datetime.timedelta(hours=9)
+
+                # KST 문자열 생성
+            kst_str = kst_dt.strftime("%Y-%m-%d %H:%M:%S KST")
+
+            # 원본 형식 그대로 유지 (데이터베이스에 있는 형식)
+            original_format = original_published_at
+
             # MessageDevEUIResponse 객체 생성
             message_data = {
                 "battery": values.get("batteryLevel", 0),
                 "longitude": values.get("longitude", 0.0),
                 "latitude": values.get("latitude", 0.0),
-                "publishedAt": values.get("publishedAt", datetime.datetime.now())
+                "publishedAt": original_format,  # 원본 형식 유지
             }
 
             items.append(MessageDevEUIResponse(**message_data))
+
+            if info is None:
+                info = {
+                    "dev_eui": values.get("devEUI", ""),
+                    "sensor_type": content.get("uplinkEvent", None).get("deviceInfo", {}).get("tags", {}).get("type",""),
+                    "battery": values.get("batteryLevel", 0),
+                    "longitude": values.get("longitude", 0.0),
+                    "latitude": values.get("latitude", 0.0),
+                    "publishedAt": original_format,
+                    "published_at_kst": kst_str
+                }
+
         except Exception as e:
             # 예외 처리 (필드가 없는 경우 등)
             print(f"데이터 변환 중 오류: {e}")
             continue
 
+    # info가 없는 경우 빈 딕셔너리 설정
+    if info is None:
+        info = {}
+
     # 페이지네이션 응답 구성
     return {
-        "items": items,
+        "logs": items,
+        "info": info,
         "total": total,
         "page": query.page,
         "page_size": query.page_size,
