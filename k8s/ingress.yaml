@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastapi-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # TLS를 사용하는 경우 추가
+    # kubernetes.io/tls-acme: "true"
+spec:
+  rules:
+  - host: api.yourdomain.com  # 실제 도메인으로 변경 필요
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: fastapi-service
+            port:
+              number: 80
+  # TLS를 사용하는 경우 추가
+  # tls:
+  # - hosts:
+  #   - api.yourdomain.com
+  #   secretName: fastapi-tls-secret

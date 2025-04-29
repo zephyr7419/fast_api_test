@@ -1,0 +1,28 @@
+# FastAPI & 서버
+fastapi>=0.115.0
+uvicorn>=0.34.0
+pydantic>=2.11.0
+
+# 데이터베이스
+# PostgreSQL (현재 사용 중)
+sqlalchemy>=2.0.40
+asyncpg>=0.30.0
+
+# MongoDB (새로 추가)
+motor>=3.3.2
+pymongo>=4.6.1
+
+# RabbitMQ
+aio-pika>=9.5.0
+
+# 환경 변수 관리
+python-dotenv>=1.0.0
+
+# 로깅 및 유틸리티
+loguru>=0.7.2
+
+# 개발 도구 (선택 사항)
+pytest>=7.4.0
+httpx>=0.25.0  # FastAPI 테스트 클라이언트
+
+python-dateutil>=2.9.0
