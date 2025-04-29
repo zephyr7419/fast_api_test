@@ -12,12 +12,12 @@ class Settings(BaseSettings):
     MONGODB_DATABASE: str
 
     # Database
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_SERVER: str
-    POSTGRES_PORT: str
-    POSTGRES_DB: str
-    SQLALCHEMY_DATABASE_URI: str = None
+    # POSTGRES_USER: str
+    # POSTGRES_PASSWORD: str
+    # POSTGRES_SERVER: str
+    # POSTGRES_PORT: str
+    # POSTGRES_DB: str
+    # SQLALCHEMY_DATABASE_URI: str = None
 
     # RabbitMQ
     RABBITMQ_URL: str
@@ -36,11 +36,11 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
 
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, v, values):
-        if v is None or v == "":
-            return f"postgresql+asyncpg://{values['POSTGRES_USER']}:{values['POSTGRES_PASSWORD']}@{values['POSTGRES_SERVER']}:{values['POSTGRES_PORT']}/{values['POSTGRES_DB']}"
-        return v
+    # @validator("SQLALCHEMY_DATABASE_URI", pre=True)
+    # def assemble_db_connection(cls, v, values):
+    #     if v is None or v == "":
+    #         return f"postgresql+asyncpg://{values['POSTGRES_USER']}:{values['POSTGRES_PASSWORD']}@{values['POSTGRES_SERVER']}:{values['POSTGRES_PORT']}/{values['POSTGRES_DB']}"
+    #     return v
 
     def get_cors_origins(self) -> List[str]:
         if self.CORS_ORIGINS == "*":

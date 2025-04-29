@@ -3,7 +3,6 @@ import json
 import re
 from app.schemas.message import AllDevEUIResponse
 import logging
-from pydantic.v1.datetime_parse import parse_date
 
 from app.db.mongodb import MongoDB, logger
 from app.schemas.message import MessageResponse, MessageQuery, MessageDevEUIResponse
@@ -139,6 +138,8 @@ async def get_all_devices_latest_data():
 
             device_data = {
                 "dev_eui": dev_eui,
+                "device_name": device_info.get("deviceName", ""),
+                "company": tags.get("company", ""),
                 "sensor_type": tags.get("type", ""),
                 "battery": values.get("batteryLevel", 0),
                 "longitude": values.get("longitude", 0.0),

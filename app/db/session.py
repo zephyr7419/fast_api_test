@@ -1,14 +1,10 @@
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from app.db.mongodb import MongoDB
 
-from app.db.base import AsyncSessionLocal
-
-
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """Dependency for getting async database session"""
-    session = AsyncSessionLocal()
-    try:
-        yield session
-    finally:
-        await session.close()
+async def get_db() -> AsyncGenerator:
+    """Dependency for getting MongoDB database session"""
+    if MongoDB.db is None:
+        yield None
+    else:
+        yield MongoDB.db

@@ -4,7 +4,8 @@ from typing import Callable
 
 from fastapi import FastAPI
 
-from app.db.base import engine, Base
+# SQLAlchemy 관련 import 제거
+# from app.db.base import engine, Base
 from app.db.mongodb import connect_to_mongodb, close_mongodb_connection
 from app.db.session import get_db
 from app.schemas.message import MessageCreate
@@ -31,7 +32,7 @@ def create_start_app_handler(app: FastAPI) -> Callable:
     Create a function that handles app startup
     """
     async def start_app() -> None:
-        await  connect_to_mongodb()
+        await connect_to_mongodb()
 
         # Set up RabbitMQ connection
         app.state.rabbitmq = RabbitMQService()

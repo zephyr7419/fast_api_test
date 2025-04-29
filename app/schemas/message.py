@@ -62,6 +62,8 @@ class MessageDevEUIResponse(BaseModel):
 
 class AllDevEUIResponse(BaseModel):
     dev_eui: str
+    device_name: str
+    company: str
     sensor_type: str = ""
     battery: int = 0
     longitude: float = 0.0
